@@ -64,12 +64,12 @@ class GUI:
         self.show_image_number(self.num_showing_image - 1)
 
     def rotate_image_right(self):
-        self.rotate_image(ROTATE_270)
+        self.rotate_image(Image.ROTATE_270)
 
     def rotate_image_left(self):
-        self.rotate_image(IMAGE.ROTATE_90)
+        self.rotate_image(Image.ROTATE_90)
     
-    def rotate_image(rotation):
+    def rotate_image(self,rotation):
         i = self.image_showing
         i = i.transpose(rotation)
         i_thumb = i.copy()
