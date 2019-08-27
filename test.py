@@ -7,6 +7,8 @@ import pytesseract
 import argparse
 import os
 
+import date_entry
+
 
 import Tkinter as tk
 
@@ -29,7 +31,7 @@ class GUI:
 
         self.reciepts = all_reciepts
 
-        self.master.title = "Doug's Reciept GUI" 
+        self.master.title("Doug's Reciept GUI")
         tk.Label(master, text="Red X to stop", font='bold').grid(row=0,column=0)
 
         next = tk.Button(master,text="Show next image",command=self.show_next_image)
@@ -48,7 +50,15 @@ class GUI:
         prev.grid(row=5,column=0)
 
         self.canvas = tk.Canvas(master,width=1000,height=1000)
-        self.canvas.grid(row=10,column=3)
+        self.canvas.grid(row=1,column=3,rowspan=10)
+
+        tk.Label(root,text="Day / Month / Year").grid(row=6,column=0)
+
+        self.date = date_entry.DateEntry(root)
+        self.date.grid(row=7,column=0)
+
+        process_date = tk.Button(master,text="Process Date",command=self.read_date)
+        process_date.grid(row=8,column=0)
 
         self.imagetk_showing = None  #important quirk, have to save the reference to the image that is being shown so it doesn't get garbage collected
         self.image_showing = None #so I can remeber the image that I'm currently showing, so I can transform it
@@ -97,6 +107,9 @@ class GUI:
 
     def run_OCR(self):
         print(pytesseract.image_to_string(self.image_showing,config='load_system_dawg = False, load_freq_dawg = False'))
+
+    def read_date(self):
+    	print(self.date.get())
 
 
 

@@ -55,8 +55,11 @@ if __name__ == '__main__':
     win = tk.Tk()
     win.title('DateEntry demo')
 
-    dentry = DateEntry(win, font=('Helvetica', 40, tk.NORMAL), border=0)
+    dentry = DateEntry(win)#, #font=('Helvetica', 40, tk.NORMAL), border=0)
     dentry.pack()
 
-    win.bind('<Return>', lambda e: print(dentry.get()))
+    dentry.grid(row=4,column=0)
+
+    #this line doesn't work on python2, idk why.
+    #win.bind('<Return>', lambda e: print(dentry.get()))
     win.mainloop()
