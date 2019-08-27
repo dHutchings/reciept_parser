@@ -17,9 +17,10 @@ import date_entry
 import Tkinter as tk
 from tkinter import ttk
 
-import all_suppliers
-
 import tkinterAutocompleteListbox
+
+
+suppliers_file = "All_suppliers.csv"
 
 def foo():
     i = Image.open('Desk_reciepts/Image-00005.png')
@@ -37,6 +38,9 @@ def foo():
 class GUI:
 
     def __init__(self, master, all_reciept_paths, original_dir, output_dir, processed_dir):
+
+        print(self.load_suppliers())
+
         self.master = master #get the master tkinter window.
         self.master.title("Doug's Reciept GUI")
 
@@ -78,10 +82,12 @@ class GUI:
 
         tk.Label(root,text="Supplier").grid(row=11,column=0)
 
-        self.supplier_choice = tk.StringVar(master)
-        #supplier = tk.OptionMenu(master,self.supplier_choice,*all_suppliers.suppliers) #point it to the all_suppliers for options for now.  TODO: New supplier.
-        supplier = tkinterAutocompleteListbox.AutocompleteEntry(all_suppliers.suppliers)
-        supplier.grid(row=12,column=0)
+        self.supplier_inbox = tkinterAutocompleteListbox.AutocompleteEntry(self.load_suppliers())#,textvariable = self.supplier_choice)
+        self.supplier_inbox.grid(row=12,column=0)
+
+        #It looks like passing in a StringVar into the supplier autocomplete box isn't working.  Don't know why.  Instead, have to use the supplier inbox's internal one.
+        self.supplier_choice = self.supplier_inbox.var
+
 
         tk.Label(root,text="Explanation").grid(row=13,column=0)
         self.explanation = tk.StringVar()
@@ -191,9 +197,15 @@ class GUI:
 
 
     def process_reciept(self):
+        #come up with the needed file name extension        
+        head,tail = os.path.split(self.reciepts[self.num_showing_image]) #this contains the foldernames of the path, without the filename itself, but WITH the foldername and /originals.
+        head = head.replace(self.original_dir,'') #get rid of the filename itself and the /originals
+        head = head[1:] #getrid of the leading /
+
+
         if self.new_path[self.num_showing_image] is not None:
             #that means i've processed it before, but I want to rename it.  That means the old filename has to go.
-            os.remove(os.path.join(self.output_dir,self.new_path[self.num_showing_image]))
+            os.remove(os.path.join(self.output_dir,head,self.new_path[self.num_showing_image]))
 
         #come up with the new name
         new_name = "[" + self.read_date() + "]" + " " + str(self.supplier_choice.get()) + " " + str(self.explanation.get()) + " $" + str(self.price.get()) + ".png"
@@ -206,23 +218,44 @@ class GUI:
         self.new_path[self.num_showing_image] = new_name
         self.new_name.set(new_name)
 
-        head,tail = os.path.split(self.reciepts[self.num_showing_image]) #this contains the foldernames of the path, without the filename itself, but WITH the foldername and /originals.
-        head = head.replace(self.original_dir,'') #get rid of the filename itself and the /originals
-        head = head[1:] #getrid of the leading /
-
         #ok.  I have a new name, and I know the old name.  Time to do some copy-pastaing.
         shutil.copyfile(self.reciepts[self.num_showing_image],os.path.join(self.output_dir,head,new_name)) #copy with thew new name to the output directory
         shutil.copyfile(self.reciepts[self.num_showing_image],os.path.join(self.processed_dir,head,tail)) #and move it with the old name to the processed directory
 
+        self.process_new_supplier(self.supplier_choice.get())
 
     def on_closing(self): #on closing, delete all the files that need to be nuked.  Namely the files from input_directory that I have dealt with.
         print("Closing!")
         for i in range(0,len(all_reciepts)):
             if self.processed[i]: #I have processed the "ith reciept"
-                print("removing" + str(self.reciepts[i]))
+                print("removing: " + str(self.reciepts[i]))
                 os.remove(self.reciepts[i])
 
         self.master.destroy()
+
+    def process_new_supplier(self,possible_new_supplier):
+        if possible_new_supplier not in self.load_suppliers():
+            print("Adding a new supplier: " +str(possible_new_supplier))
+            suppliers = self.load_suppliers()
+            suppliers.append(possible_new_supplier)
+            suppliers = [ line + "\n" for line in suppliers]
+            with open(suppliers_file,'w') as f:
+                f.writelines(suppliers)
+
+            self.supplier_inbox.autocompleteList = self.load_suppliers()
+
+
+
+
+
+    def load_suppliers(self):
+        with open(suppliers_file,'r') as f:
+            suppliers = f.readlines()
+
+        suppliers = [line.strip() for line in suppliers]
+        return suppliers
+
+
 
 
 

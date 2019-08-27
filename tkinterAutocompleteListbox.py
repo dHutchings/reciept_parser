@@ -43,6 +43,7 @@ class AutocompleteEntry(tk.Entry):
 
         self.autocompleteList = autocompleteList
 
+
         self.var = self["textvariable"]
         if self.var == '':
             self.var = self["textvariable"] = tk.StringVar()
