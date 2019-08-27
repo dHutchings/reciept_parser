@@ -77,9 +77,6 @@ class GUI:
         self.date = date_entry.DateEntry(root)
         self.date.grid(row=9,column=0)
 
-        process_date = tk.Button(master,text="Process Date",command=self.read_date)
-        process_date.grid(row=10,column=0)
-
         tk.Label(root,text="Supplier").grid(row=11,column=0)
 
         self.supplier_inbox = tkinterAutocompleteListbox.AutocompleteEntry(self.load_suppliers())#,textvariable = self.supplier_choice)
