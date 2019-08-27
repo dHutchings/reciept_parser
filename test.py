@@ -170,6 +170,18 @@ class GUI:
 
     def read_date(self):
         date_arr = self.date.get()
+
+        #add zeros in front of day and months, if needed
+        if(len(date_arr[0])==1):
+            date_arr[0] = "0"+str(date_arr[0])
+        if(len(date_arr[1])==1):
+            date_arr[1] = "0"+str(date_arr[1])
+
+        #amd 20 in front of the 2-digit year
+        if(len(date_arr[2])==2):
+            date_arr[2] = "20"+str(date_arr[2])
+
+
         return date_arr[2] + "-" + date_arr[1] + "-" + date_arr[0]
 
 
