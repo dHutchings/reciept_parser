@@ -44,8 +44,8 @@ class DateEntry(tk.Frame):
 
         if len(data) > size or not data.isdigit():
             self._backspace(entry)
-        if len(data) >= size and next_entry:
-            next_entry.focus()
+        #if len(data) >= size and next_entry:
+        #    next_entry.focus()
 
     def get(self):
         return [e.get() for e in self.entries]

@@ -1,0 +1,1 @@
+suppliers = {"A","B","McMaster"}
