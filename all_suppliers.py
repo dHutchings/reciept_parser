@@ -1,1 +1,1 @@
-suppliers = {"A","B","McMaster"}
+suppliers = ["A","B","McMaster","American_Airlines","Walgreens"]

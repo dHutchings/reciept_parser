@@ -19,6 +19,8 @@ from tkinter import ttk
 
 import all_suppliers
 
+import tkinterAutocompleteListbox
+
 def foo():
     i = Image.open('Desk_reciepts/Image-00005.png')
     s = i.size
@@ -77,7 +79,8 @@ class GUI:
         tk.Label(root,text="Supplier").grid(row=11,column=0)
 
         self.supplier_choice = tk.StringVar(master)
-        supplier = tk.OptionMenu(master,self.supplier_choice,*all_suppliers.suppliers) #point it to the all_suppliers for options for now.  TODO: New supplier.
+        #supplier = tk.OptionMenu(master,self.supplier_choice,*all_suppliers.suppliers) #point it to the all_suppliers for options for now.  TODO: New supplier.
+        supplier = tkinterAutocompleteListbox.AutocompleteEntry(all_suppliers.suppliers)
         supplier.grid(row=12,column=0)
 
         tk.Label(root,text="Explanation").grid(row=13,column=0)

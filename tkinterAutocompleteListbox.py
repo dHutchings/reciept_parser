@@ -158,4 +158,4 @@ if __name__ == '__main__':
     tk.Button(text='Fixed bugs').grid(column=0)
     tk.Button(text='New features').grid(column=0)
     tk.Button(text='Check code comments').grid(column=0)
-root.mainloop()
+    root.mainloop()
