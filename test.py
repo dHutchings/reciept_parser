@@ -36,8 +36,10 @@ class GUI:
 
     def __init__(self, master, all_reciept_paths, original_dir, output_dir, processed_dir):
         self.master = master #get the master tkinter window.
-
         self.master.title("Doug's Reciept GUI")
+
+        self.master.protocol("WM_DELETE_WINDOW",self.on_closing) #hook up the on_closing function to when the window closes.
+
         tk.Label(master, text="Red X to stop", font='bold').grid(row=0,column=0)
 
         ttk.Separator(master, orient=tk.HORIZONTAL).grid(row = 1, column=0, columnspan=1, sticky=(tk.E,tk.W))
@@ -201,12 +203,24 @@ class GUI:
         self.new_path[self.num_showing_image] = new_name
         self.new_name.set(new_name)
 
-        head = os.path.split(self.reciepts[self.num_showing_image])[0] #this contains the foldernames of the path, without the filename itself, but WITH the foldername and /originals.
+        head,tail = os.path.split(self.reciepts[self.num_showing_image]) #this contains the foldernames of the path, without the filename itself, but WITH the foldername and /originals.
         head = head.replace(self.original_dir,'') #get rid of the filename itself and the /originals
         head = head[1:] #getrid of the leading /
 
         #ok.  I have a new name, and I know the old name.  Time to do some copy-pastaing.
-        shutil.copyfile(self.reciepts[self.num_showing_image],os.path.join(self.output_dir,head,new_name))
+        shutil.copyfile(self.reciepts[self.num_showing_image],os.path.join(self.output_dir,head,new_name)) #copy with thew new name to the output directory
+        shutil.copyfile(self.reciepts[self.num_showing_image],os.path.join(self.processed_dir,head,tail)) #and move it with the old name to the processed directory
+
+
+    def on_closing(self): #on closing, delete all the files that need to be nuked.  Namely the files from input_directory that I have dealt with.
+        print("Closing!")
+        for i in range(0,len(all_reciepts)):
+            if self.processed[i]: #I have processed the "ith reciept"
+                print("removing" + str(self.reciepts[i]))
+                os.remove(self.reciepts[i])
+
+        self.master.destroy()
+
 
 
 
