@@ -14,7 +14,7 @@ import datetime
 import date_entry
 
 
-import Tkinter as tk
+import tkinter as tk
 from tkinter import ttk
 
 import tkinterAutocompleteListbox
