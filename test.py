@@ -41,6 +41,23 @@ class GUI:
 
         print(self.load_suppliers())
 
+        self.reciepts = all_reciept_paths #an array, len(all_reciepts) long, containing the path to the original reciepts.  We can't actually move them untill the end, otherwise the show_image_number will break
+        self.processed = [False]*len(all_reciepts) #an array, showing if the reciept has been processed or not.
+        self.new_path = [None]*len(all_reciepts) #an array, showing the new path for the reciept.  Need to know this in case we need to overwrite it.
+
+
+        #original dir is the directory these files come from.  Output is where renamed copies go.  processed is where the ones that are renamed go (keeping their original name)
+        self.original_dir = original_dir
+        self.output_dir = output_dir
+        self.processed_dir = processed_dir
+
+        self.imagetk_showing = None  #important quirk, have to save the reference to the image that is being shown so it doesn't get garbage collected
+        self.image_showing = None #so I can remeber the image that I'm currently showing, so I can transform it
+        #self.num_showing_image = -1 #i'm not yet showing an image
+        self.num_showing_image = tk.IntVar()
+        self.num_showing_image.set(-1)
+
+
         self.master = master #get the master tkinter window.
         self.master.title("Doug's Reciept GUI")
 
@@ -111,32 +128,22 @@ class GUI:
 
         tk.Label(root,text="Processed Name: ").grid(row=0,column=3)
         self.new_name_disp = tk.Label(root,textvariable = self.new_name).grid(row=0,column=4)
+        
+        tk.Label(root,text="On Reciept: ").grid(row=0,column=4)
+        self.number_disk=tk.Label(root,textvariable = self.num_showing_image).grid(row=0,column=5)
 
 
 
-        self.reciepts = all_reciept_paths #an array, len(all_reciepts) long, containing the path to the original reciepts.  We can't actually move them untill the end, otherwise the show_image_number will break
-        self.processed = [False]*len(all_reciepts) #an array, showing if the reciept has been processed or not.
-        self.new_path = [None]*len(all_reciepts) #an array, showing the new path for the reciept.  Need to know this in case we need to overwrite it.
-
-
-        #original dir is the directory these files come from.  Output is where renamed copies go.  processed is where the ones that are renamed go (keeping their original name)
-        self.original_dir = original_dir
-        self.output_dir = output_dir
-        self.processed_dir = processed_dir
-
-        self.imagetk_showing = None  #important quirk, have to save the reference to the image that is being shown so it doesn't get garbage collected
-        self.image_showing = None #so I can remeber the image that I'm currently showing, so I can transform it
-        self.num_showing_image = -1 #i'm not yet showing an image
 
 
 
 
     def show_next_image(self):
-        self.show_image_number(self.num_showing_image + 1)
+        self.show_image_number(self.num_showing_image.get() + 1)
 
 
     def show_previous_image(self):
-        self.show_image_number(self.num_showing_image - 1)
+        self.show_image_number(self.num_showing_image.get() - 1)
 
     def rotate_image_right(self):
         self.rotate_image(Image.ROTATE_270)
@@ -158,12 +165,12 @@ class GUI:
         if (num < 0) or (num > len(self.reciepts) -1 ):
             return
 
-        self.num_showing_image = num
+        self.num_showing_image.set(num)
 
-        self.this_reciept_processed.set(self.processed[self.num_showing_image])
-        self.new_name.set(self.new_path[self.num_showing_image])
+        self.this_reciept_processed.set(self.processed[self.num_showing_image.get()])
+        self.new_name.set(self.new_path[self.num_showing_image.get()])
 
-        i = Image.open(self.reciepts[self.num_showing_image])
+        i = Image.open(self.reciepts[self.num_showing_image.get()])
         #i.show()
         i_thumb = i.copy()
         i_thumb.thumbnail((1000, 1000), Image.ANTIALIAS)
@@ -195,14 +202,14 @@ class GUI:
 
     def process_reciept(self):
         #come up with the needed file name extension        
-        head,tail = os.path.split(self.reciepts[self.num_showing_image]) #this contains the foldernames of the path, without the filename itself, but WITH the foldername and /originals.
+        head,tail = os.path.split(self.reciepts[self.num_showing_image.get()]) #this contains the foldernames of the path, without the filename itself, but WITH the foldername and /originals.
         head = head.replace(self.original_dir,'') #get rid of the filename itself and the /originals
         head = head[1:] #getrid of the leading /
 
 
-        if self.new_path[self.num_showing_image] is not None:
+        if self.new_path[self.num_showing_image.get()] is not None:
             #that means i've processed it before, but I want to rename it.  That means the old filename has to go.
-            os.remove(os.path.join(self.output_dir,head,self.new_path[self.num_showing_image]))
+            os.remove(os.path.join(self.output_dir,head,self.new_path[self.num_showing_image.get()]))
 
         #come up with the new name
         new_name = "[" + self.read_date() + "]" + " " + str(self.supplier_choice.get()) + " " + str(self.explanation.get()) + " $" + str(self.price.get()) + ".png"
@@ -210,14 +217,14 @@ class GUI:
 
         #set things up
         self.this_reciept_processed.set(True)
-        self.processed[self.num_showing_image] = True  #when I close down, all the files listed as "processed" will get moved
+        self.processed[self.num_showing_image.get()] = True  #when I close down, all the files listed as "processed" will get moved
 
-        self.new_path[self.num_showing_image] = new_name
+        self.new_path[self.num_showing_image.get()] = new_name
         self.new_name.set(new_name)
 
         #ok.  I have a new name, and I know the old name.  Time to do some copy-pastaing.
-        shutil.copyfile(self.reciepts[self.num_showing_image],os.path.join(self.output_dir,head,new_name)) #copy with thew new name to the output directory
-        shutil.copyfile(self.reciepts[self.num_showing_image],os.path.join(self.processed_dir,head,tail)) #and move it with the old name to the processed directory
+        shutil.copyfile(self.reciepts[self.num_showing_image.get()],os.path.join(self.output_dir,head,new_name)) #copy with thew new name to the output directory
+        shutil.copyfile(self.reciepts[self.num_showing_image.get()],os.path.join(self.processed_dir,head,tail)) #and move it with the old name to the processed directory
 
         self.process_new_supplier(self.supplier_choice.get())
 
