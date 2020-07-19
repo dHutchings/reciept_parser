@@ -173,7 +173,7 @@ class GUI:
         i = Image.open(self.reciepts[self.num_showing_image.get()])
         #i.show()
         i_thumb = i.copy()
-        i_thumb.thumbnail((1000, 1000), Image.ANTIALIAS)
+        i_thumb.thumbnail((750, 750), Image.ANTIALIAS)
         img = ImageTk.PhotoImage(i_thumb)
         self.canvas.create_image(0,0,anchor=tk.NW,image=img)
         self.image_showing = i

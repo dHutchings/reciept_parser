@@ -37,7 +37,7 @@ if __name__ == "__main__":
 	
 	reciepts = []
 	
-	dates_search= re.compile("\[\d\d\d\d\.\d\d\.\d\d\]")
+	dates_search= re.compile("\[\d\d\d\d\-\d\d\-\d\d\]")
 	cost_search = re.compile("\$\d*.\d\d\.")
 	
 	spaces_search = re.compile("\ ")
