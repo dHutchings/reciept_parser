@@ -32,7 +32,7 @@ if __name__ == "__main__":
 	all_files = list_filenames(parsed.folder_location)
 	
 	
-	myfile = open('myfile.csv','wb')
+	myfile = open('myfile.csv','w')
 	wrtr = csv.writer(myfile,delimiter=',', quotechar='"')
 	
 	reciepts = []
